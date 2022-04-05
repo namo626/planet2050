@@ -18,6 +18,7 @@
 \documentclass[american]{article}
 \input{source/preambulo}
 \usepackage{sectsty}
+%\usepackage[breaklinks]{hyperref}
 \sffamily
 \sectionfont{\fontsize{50}{72}\selectfont}
 %\renewcommand{\familydefault}{\sfdefault}
@@ -32,6 +33,7 @@
 \newcommand\pinte{\int_{\partial\Omega^e}}
 \newcommand\ve[1]{\mathbf{#1}}
 
+\urlstyle{sf}
 \usepackage{titlesec}
 \titlespacing{\section}{0pt}{1ex}{1ex}
 % ===========================================================================
@@ -55,13 +57,13 @@
   \begin{minipage}{.6\linewidth}
     \begin{center}
        \textsf{\textbf{{\fontsize{65}{108}\selectfont  Developing a Compound Flooding Model using the Discontinuous Galerkin Method}}}\\\vspace{1cm}
-       \textrm{\fontsize{40}{48}\selectfont Chayanon (Namo) Wichitrnithed\Mark{1}, Eirik Valseth\Mark{1}, Clint Dawson\Mark{1} \\\vspace{5mm} \Mark{1}\textit{The Oden Institute for Computational Engineering and Sciences at the University of Texas at Austin} \vspace{5mm} }
+       \textrm{\fontsize{40}{48}\selectfont Chayanon (Namo) Wichitrnithed, Eirik Valseth, Clint Dawson \\\vspace{5mm} \textit{The Oden Institute for Computational Engineering and Sciences at the University of Texas at Austin} \vspace{5mm} }
     \end{center}
   \end{minipage}
   %&
   \hspace{.03\linewidth}
     \begin{minipage}{.16\linewidth}
-    \includegraphics[width=\linewidth]{media/images/msi_logo.png}
+    \includegraphics[width=\linewidth]{media/planet.png}
     ~\vfill
     ~\vfill
   \end{minipage}
@@ -85,18 +87,18 @@
 
 \begin{center}
   \vspace{5mm}
-  \includegraphics[width=0.75\linewidth]{media/compound.jpg} \\
-  \textbf{Figure 1:} Components of compound flooding. Source: \textit{Climate Security in Oceania, UT Austin}
+  \includegraphics[width=0.85\linewidth]{media/compound_flooding.jpg} \\
+  \textbf{Figure 1:} Components of compound flooding [1].
 \end{center}
-Compound flooding is a complex phenomena that arises when flooding sources such as storm surge, rainfall and river discharge occur simultaneously (Figure 1). The combined effect of these sources can be devastating, as most notably seen in Houston area during Hurricane Harvey, where storm surges prevented drainage of rainfall runoff. This interdependency makes it difficult to simulate compound flooding because the model has to be able to combine these sources in a nonlinear way.
+Compound flooding is a complex phenomena that arises when flooding sources such as storm surge, rainfall and river discharge occur simultaneously. The combined effect of these sources can be devastating, as most notably seen in Houston area during Hurricane Harvey, where storm surges prevented drainage of rainfall runoff (Figure 1). This interdependency makes it difficult to simulate compound flooding because the model has to be able to combine these sources in a nonlinear way.
 
 Regular simulations are usually done with the Advanced Circulation Model (ADCIRC), a computer program that discretizes the fluid on a 2D finite element mesh. However, it is difficult to add source terms that account for parts of compound flooding, in this case rainfall. Moreover, the continuous Galerkin method (CG) used in ADCIRC does not guarantee mass conservation in each element which can lead to inaccuracies when source terms are added.
-Due to these limitations, we test the effect of incorporating rainfall and river discharge into the Discontinuous Galerkin Shallow Water Equation model (DGSWEM), a model based on ADCIRC that uses the discontinuous Galerkin method (DG).
+Due to these limitations, we test the effect of incorporating rainfall and river discharge into the Discontinuous Galerkin Shallow Water Equation model (DG-SWEM), a model based on ADCIRC that uses the discontinuous Galerkin method (DG).
 
 \hrulefill
 
 \section*{Model}
-\noindent DGSWEM uses the shallow water equations (SWE) which are an approximate model for a thin (relative to depth) layer of water in two dimensions. The continuity equation in this case is simply
+\noindent DG-SWEM uses the shallow water equations (SWE) which are an approximate model for a thin (relative to depth) layer of water in two dimensions. The continuity equation in this case is simply
 \begin{align*}
   \pd{\zeta}{t} + \pd{}{x} (Hu) + \pd{}{y} (Hv) = {\color{red} S(t,x,y)}
 \end{align*}
@@ -119,16 +121,16 @@ The test case is the Neches River shown in Figure 2, triangulated with 62,075 no
 Here, $\partial \Omega^e$ is the element boundary, $\ve{F}$ is the vector $[uH, vH]^T$, $v$ is the test function on $\Omega^e$, and $\ve{\widehat{F}}$ is the appropriate numerical flux (the Roe flux is used here).
 \begin{center}
   \vspace{5mm}
-    \includegraphics[width=0.55 \linewidth]{media/dg.png} \\
-    \textbf{Figure 3:} An example DG mesh with quadrilateral elements. Source: \textit{Google}
+    \includegraphics[width=0.55 \linewidth]{media/DG_CG.jpg} \\
+    \textbf{Figure 3:} An comparison of linear continuous- and discontinuous Galerkin elements [2]. In DG, the solution doesn't need to match at the nodes.
 \end{center}
 Upstream river discharge is added by supplying the flow rates $u$ and $v$ to the numerical flux at the corresponding element boundaries.
 Solving this system yields a system of ODEs which we then solve using the second order Strong Stability Preserving Runge-Kutta scheme (SSPRK).
 Finally, the solution at the nodes is obtained by averaging the values of discontinuous solutions from the neighboring elements.
 
 
-\section*{Results}
-\noindent We ran DGSWEM on the Neches domain with 1 inch of rain per hour, constant throughout the whole domain. The simulation was run on 128 CPU cores at a time step of 0.1 seconds for 6 simulation days, which took around 8 hours in real time. A plot of water elevation at day 6 is given in Figure 4. As can be seen, the flow is compounded by the river discharge from the top left corner as well as rainfall on the other part of the domain.
+\section*{Results \& Discussion}
+\noindent We ran DG-SWEM on the Neches domain with 1 inch of rain per hour, constant throughout the whole domain. The simulation was run on 128 CPU cores at a time step of 0.1 seconds for 6 simulation days, which took around 8 hours in real time. A plot of water elevation at day 6 is given in Figure 4. As can be seen, the flow is compounded by the river discharge from the top left corner as well as rainfall on the other part of the domain.
 \begin{center}
     \vspace{0.5cm}
     \includegraphics[width=0.95 \linewidth]{media/rain.jpg}
@@ -140,13 +142,19 @@ We also plot below the water elevation time series for simulations with and with
     \includegraphics[width=0.95 \linewidth]{media/rainbow_bridge.png}
     \textbf{Figure 5}: Water elevation from the simulation measured at a station at Rainbow Bridge. The station gauge data is taken from [...].
 \end{center}
-\section*{Proposed Work}
-\noindent The number of larvae that ended up reaching the above bins was shown to be highly dependent on initial condition with the difference in success rates varying as much as 22 percent between any given initial configuration. The number of larvae reaching the grass beds also differed widely between the year with the drought, 2012, and the average year, 2019 with an average difference in success rate of 7$\%$ between years. However, at each given initial condition, the differences in success rates for the case with the current channel vs the deeper channel were low with an average increase of 1.0$\%$ in success rate across all cases for the deeper channel.
+% \section*{Proposed Work}
+% \noindent The number of larvae that ended up reaching the above bins was shown to be highly dependent on initial condition with the difference in success rates varying as much as 22 percent between any given initial configuration. The number of larvae reaching the grass beds also differed widely between the year with the drought, 2012, and the average year, 2019 with an average difference in success rate of 7$\%$ between years. However, at each given initial condition, the differences in success rates for the case with the current channel vs the deeper channel were low with an average increase of 1.0$\%$ in success rate across all cases for the deeper channel.
 
 
-\renewcommand{\bibfont}{\fontsize{20}{20}\selectfont}
-\nocite{*}
-\printbibliography
+\begin{thebibliography}{2}
+\bibitem{compound}
+  Ask an expert: A coastal flood modeler explains compound flooding. (2021). Retrieved from \url{https://texaswaternewsroom.org/articles/a_coastal_flood_modeler_explains_compound_flooding.html}
+\bibitem{dg}
+  Discontinuous Galerkin finite element methods. Retrieved from \url{https://mathstats.uncg.edu/applied/dgfiniteelement/}
+\end{thebibliography}
+% \renewcommand{\bibfont}{\fontsize{20}{20}\selectfont}
+% \nocite{*}
+% \printbibliography
 
 
 
