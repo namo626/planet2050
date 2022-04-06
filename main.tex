@@ -102,7 +102,7 @@ Due to these limitations, we test the effect of incorporating rainfall and river
 \begin{align*}
   \pd{\zeta}{t} + \pd{}{x} (Hu) + \pd{}{y} (Hv) = {\color{red} S(t,x,y)}
 \end{align*}
-where $\zeta$ is the water elevation, $H$ is the total height of the water column, $u$ and $v$ the velocities in $x$ and $y$ directions, and $\color{red} S$ is where we add in the rainfall, measured in meter per second per unit area. Rainfall can vary among different parts of the domain, but here we use a constant rainfall in both space and time.
+where $\zeta$ is the water elevation, $H$ is the total height of the water column, $u$ and $v$ the velocities in $x$ and $y$ directions, and $\color{red} S$ is the rainfall per unit area. Rainfall can of course vary in time and among different parts of the domain, but in this test we use constant rainfall.
 
 \begin{center}
   \vspace{5mm}
@@ -110,15 +110,15 @@ where $\zeta$ is the water elevation, $H$ is the total height of the water colum
   \textbf{Figure 2}: Finite element mesh of the Neches river
 \end{center}
 
-The test case is the Neches River shown in Figure 2, triangulated with 62,075 nodes. We model the flow during Hurricane Harvey event (2017) in which river discharge occurs upstream and travels down the river.
+The test case is the Neches River shown in Figure 2, triangulated with 62,075 nodes. We model the flow during Hurricane Harvey, where rainfall and river discharge occur upstream and travel down the river.
 
 \hrulefill
 \section*{Method}
-\noindent The DG method differs from CG in that it enforces the weak formulation on each individual element and the solution is allowed to be discontinuous across elements. This effectively guarantees that water elevation is conserved in each element, i.e. the net change is only due to inflow and outflow. In mathematical terms, the weak form for the continuity equation on element $\Omega^e$ is
+\noindent The DG method differs from CG in that it enforces the weak form on each individual element and the solution is allowed to be discontinuous across elements. This effectively guarantees that water elevation is conserved in each element, i.e. the net change is only due to inflow and outflow. In mathematical terms, the weak form for the continuity equation on element $\Omega^e$ is
 \begin{align*}
-  \inte \pd{\zeta}{t} v - \inte \nabla v \cdot \ve{F} + \pinte v \ve{\widehat{F}} \cdot \ve{n}  = \inte v S.
+  \inte \pd{\zeta}{t} w - \inte \nabla w \cdot \ve{F} + \pinte w \ve{\widehat{F}} \cdot \ve{n}  = \inte w S.
 \end{align*}
-Here, $\partial \Omega^e$ is the element boundary, $\ve{F}$ is the vector $[uH, vH]^T$, $v$ is the test function on $\Omega^e$, and $\ve{\widehat{F}}$ is the appropriate numerical flux (the Roe flux is used here).
+Here, $\partial \Omega^e$ is the element boundary, $\ve{F}$ is the vector $[uH, vH]^T$, $w$ is the test function on $\Omega^e$, and $\ve{\widehat{F}}$ is the appropriate numerical flux (the Roe flux is used here).
 \begin{center}
   \vspace{5mm}
     \includegraphics[width=0.55 \linewidth]{media/DG_CG.jpg} \\
@@ -129,21 +129,21 @@ Solving this system yields a system of ODEs which we then solve using the second
 Finally, the solution at the nodes is obtained by averaging the values of discontinuous solutions from the neighboring elements.
 
 
-\section*{Results \& Discussion}
-\noindent We ran DG-SWEM on the Neches domain with 1 inch of rain per hour, constant throughout the whole domain. The simulation was run on 128 CPU cores at a time step of 0.1 seconds for 6 simulation days, which took around 8 hours in real time. A plot of water elevation at day 6 is given in Figure 4. As can be seen, the flow is compounded by the river discharge from the top left corner as well as rainfall on the other part of the domain.
+\section*{Results and Discussion}
+\noindent We ran DG-SWEM on the Neches domain with 1 inch of rain per hour, constant throughout the whole domain. The simulation was run on 128 CPU cores at a time step of 0.1 seconds for 6 simulation days, which took around 6 hours in real time. A plot of water elevation at day 6 is given in Figure 4. As can be seen, the flow is compounded by the river discharge from the top left corner as well as rainfall on the rest of the domain.
 \begin{center}
     \vspace{0.5cm}
     \includegraphics[width=0.95 \linewidth]{media/rain.jpg}
     \textbf{Figure 4:} Water elevation of the Neches river on the 6th day.
 \end{center}
-We also plot below the water elevation time series for simulations with and without rainfall in Figure 5. These are computed at a recording station located at Rainbow Bridge, whose recorded values are also plotted for comparison. As expected, when rain is added, the elevation is growing faster.
+We also plot below the water elevation time series for simulations with and without rainfall in Figure 5. These are computed at two recording stations in the domain.
 \begin{center}
     \vspace{0.5cm}
-    \includegraphics[width=0.95 \linewidth]{media/rainbow_bridge.png}
-    \textbf{Figure 5}: Water elevation from the simulation measured at a station at Rainbow Bridge. The station gauge data is taken from [...].
+    \includegraphics[width=0.95 \linewidth]{media/double.png}
+    \textbf{Figure 5}: Water elevation data from the simulation measured at Rainbow Bridge (right) and at Salt Water Barrier (left).
 \end{center}
-% \section*{Proposed Work}
-% \noindent The number of larvae that ended up reaching the above bins was shown to be highly dependent on initial condition with the difference in success rates varying as much as 22 percent between any given initial configuration. The number of larvae reaching the grass beds also differed widely between the year with the drought, 2012, and the average year, 2019 with an average difference in success rate of 7$\%$ between years. However, at each given initial condition, the differences in success rates for the case with the current channel vs the deeper channel were low with an average increase of 1.0$\%$ in success rate across all cases for the deeper channel.
+
+As a first test, these results look reasonable; for instance, the salt barrier location becomes wet slightly faster with rain and produces a higher surface elevation but in a similar pattern compared to the case without rain. Following this, we aim to test the model on bigger hurricane datasets and perform verification on the results.
 
 
 \begin{thebibliography}{2}
